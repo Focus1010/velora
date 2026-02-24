@@ -1,3 +1,5 @@
+ "use client";
+
 import * as React from "react";
 import { motion } from "framer-motion";
 
@@ -99,59 +101,55 @@ export function Hero() {
           </div>
 
           <motion.div
-            className="lg:justify-self-end"
+            className={cn(
+              "lg:justify-self-end",
+              "w-full max-w-md rounded-2xl border border-border/80 bg-card/80",
+              "shadow-[0_24px_80px_rgba(0,0,0,0.7)]",
+              "p-5 sm:p-6",
+            )}
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.5 }}
             transition={{ duration: 0.65, delay: 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
+            whileHover={{ y: -4 }}
           >
-            <motion.div
-              className={cn(
-                "w-full max-w-md rounded-2xl border border-border/80 bg-card/80",
-                "shadow-[0_24px_80px_rgba(0,0,0,0.7)]",
-                "p-5 sm:p-6",
-              )}
-              whileHover={{ y: -4 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                    Velora • Payment
-                  </p>
-                  <h2 className="mt-1 text-sm font-semibold text-foreground">
-                    Payment received
-                  </h2>
-                </div>
-                <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-400">
-                  Live
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+                  Velora • Payment
+                </p>
+                <h2 className="mt-1 text-sm font-semibold text-foreground">
+                  Payment received
+                </h2>
+              </div>
+              <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-400">
+                Live
+              </span>
+            </div>
+
+            <div className="space-y-3 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Amount</span>
+                <span className="font-semibold text-foreground">
+                  $120.00 USDC
                 </span>
               </div>
-
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Amount</span>
-                  <span className="font-semibold text-foreground">
-                    $120.00 USDC
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">From</span>
-                  <span className="font-mono text-foreground/90">
-                    9xA…kP2
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Network</span>
-                  <span className="text-foreground/90">Solana</span>
-                </div>
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-muted-foreground">Status</span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-400">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                    Completed
-                  </span>
-                </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">From</span>
+                <span className="font-mono text-foreground/90">
+                  9xA…kP2
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Network</span>
+                <span className="text-foreground/90">Solana</span>
+              </div>
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-muted-foreground">Status</span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  Completed
+                </span>
               </div>
             </div>
           </motion.div>
