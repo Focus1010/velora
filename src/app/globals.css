@@ -1,26 +1,116 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --radius: 0.625rem;
+  /* Velora core surface */
+  --background: hsl(217 4% 7%); /* #0E1116 */
+  --foreground: hsl(216 11% 91%); /* #E6E8EB */
+
+  /* Surfaces */
+  --card: hsl(215 22% 11%); /* #151A21 */
+  --card-foreground: hsl(216 11% 91%);
+  --popover: hsl(215 22% 11%);
+  --popover-foreground: hsl(216 11% 91%);
+
+  /* Brand + accents */
+  --accent: hsl(165 63% 33%); /* #1F8A70 muted emerald */
+  --accent-foreground: hsl(210 40% 98%);
+  --primary: hsl(165 63% 33%);
+  --primary-foreground: hsl(210 40% 98%);
+
+  /* Supporting tones */
+  --secondary: hsl(220 8% 13%);
+  --secondary-foreground: hsl(216 11% 91%);
+  --muted: hsl(220 9% 16%);
+  --muted-foreground: hsl(215 9% 65%);
+
+  /* Feedback */
+  --destructive: hsl(0 72% 51%);
+  --destructive-foreground: hsl(210 40% 98%);
+
+  /* Structure */
+  --border: hsla(0 0% 100% / 0.06);
+  --input: hsla(0 0% 100% / 0.08);
+  --ring: hsl(165 63% 42%);
+
+  /* Data viz / sidebar */
+  --chart-1: hsl(165 63% 33%);
+  --chart-2: hsl(201 47% 40%);
+  --chart-3: hsl(262 36% 45%);
+  --chart-4: hsl(46 92% 65%);
+  --chart-5: hsl(12 81% 61%);
+
+  --sidebar: hsl(217 4% 7%);
+  --sidebar-foreground: hsl(216 11% 91%);
+  --sidebar-primary: hsl(165 63% 33%);
+  --sidebar-primary-foreground: hsl(210 40% 98%);
+  --sidebar-accent: hsl(220 9% 16%);
+  --sidebar-accent-foreground: hsl(216 11% 91%);
+  --sidebar-border: hsla(0 0% 100% / 0.06);
+  --sidebar-ring: hsl(165 63% 42%);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+.dark {
+  /* Slightly deeper dark mode surfaces and crisper borders */
+  --background: hsl(217 5% 5%);
+  --card: hsl(215 25% 10%);
+  --border: hsla(0 0% 100% / 0.08);
+  --input: hsla(0 0% 100% / 0.1);
+  --ring: hsl(165 63% 48%);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
 }
