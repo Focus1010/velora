@@ -1,20 +1,44 @@
 import * as React from "react";
+import { motion } from "framer-motion";
 
 import { Container } from "@/components/Container";
 import { cn } from "@/lib/utils";
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 24 },
+  animate: { opacity: 1, y: 0 },
+};
 
 export function Hero() {
   return (
     <section aria-labelledby="hero-heading">
       <Container className="py-20 sm:py-24 lg:py-28">
-        <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
+        <motion.div
+          className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.21, 0.47, 0.32, 0.98] }}
+        >
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur-sm">
+            <motion.div
+              className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/40 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur-sm"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.8 }}
+              transition={{ duration: 0.5, delay: 0.05 }}
+            >
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-accent" />
               <span>Non-custodial payments for Africa</span>
-            </div>
+            </motion.div>
 
-            <div className="space-y-4">
+            <motion.div
+              className="space-y-4"
+              variants={fadeInUp}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
               <h1
                 id="hero-heading"
                 className={cn(
@@ -31,10 +55,17 @@ export function Hero() {
                 Velora lets freelancers and businesses accept USDC or SOL
                 instantly using secure, non-custodial Solana Pay infrastructure.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <button
+            <motion.div
+              className="flex flex-col gap-3 sm:flex-row sm:items-center"
+              variants={fadeInUp}
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.6, delay: 0.18 }}
+            >
+              <motion.button
                 type="button"
                 className={cn(
                   "inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold",
@@ -43,10 +74,13 @@ export function Hero() {
                   "hover:-translate-y-0.5 hover:shadow-[0_22px_60px_rgba(0,0,0,0.65)]",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 )}
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.15 }}
               >
                 Start accepting payments
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 type="button"
                 className={cn(
                   "inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold",
@@ -55,19 +89,30 @@ export function Hero() {
                   "hover:bg-foreground/5",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-border focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 )}
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.985 }}
+                transition={{ duration: 0.15 }}
               >
                 View demo
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           </div>
 
-          <div className="lg:justify-self-end">
-            <div
+          <motion.div
+            className="lg:justify-self-end"
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.5 }}
+            transition={{ duration: 0.65, delay: 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
+          >
+            <motion.div
               className={cn(
                 "w-full max-w-md rounded-2xl border border-border/80 bg-card/80",
                 "shadow-[0_24px_80px_rgba(0,0,0,0.7)]",
                 "p-5 sm:p-6",
               )}
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.2 }}
             >
               <div className="mb-4 flex items-center justify-between">
                 <div>
@@ -109,8 +154,8 @@ export function Hero() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </Container>
     </section>
   );

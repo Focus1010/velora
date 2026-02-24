@@ -1,4 +1,5 @@
 import * as React from "react";
+import { motion } from "framer-motion";
 
 import { Shield, Zap, Layers, Store } from "lucide-react";
 
@@ -32,13 +33,25 @@ export function TrustStrip() {
   return (
     <section aria-label="Trust and infrastructure" className="border-t border-border">
       <Container className="py-16">
-        <p className="text-center text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+        <motion.p
+          className="text-center text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground"
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.8 }}
+          transition={{ duration: 0.45 }}
+        >
           Trusted payment infrastructure
-        </p>
+        </motion.p>
 
-        <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5">
-          {FEATURES.map(({ title, description, Icon }) => (
-            <div
+        <motion.div
+          className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
+        >
+          {FEATURES.map(({ title, description, Icon }, index) => (
+            <motion.div
               key={title}
               className={cn(
                 "rounded-xl border border-border/80 bg-card p-5 sm:p-6",
@@ -46,6 +59,10 @@ export function TrustStrip() {
                 "transition-transform transition-shadow duration-200",
                 "hover:-translate-y-0.5 hover:shadow-md",
               )}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: 0.4, delay: 0.06 * index }}
             >
               <div className="flex items-start gap-3">
                 <div className="rounded-lg border border-border/70 bg-background/30 p-2">
@@ -60,11 +77,17 @@ export function TrustStrip() {
                   </p>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="mt-12 border-t border-border/60" />
+        <motion.div
+          className="mt-12 border-t border-border/60"
+          initial={{ opacity: 0, scaleX: 0.8 }}
+          whileInView={{ opacity: 1, scaleX: 1 }}
+          viewport={{ once: true, amount: 0.8 }}
+          transition={{ duration: 0.4 }}
+        />
       </Container>
     </section>
   );

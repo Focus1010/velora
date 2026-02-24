@@ -1,4 +1,5 @@
 import * as React from "react";
+import { motion } from "framer-motion";
 
 import { BarChart3, Link as LinkIcon, Wallet } from "lucide-react";
 
@@ -35,7 +36,13 @@ export function HowItWorks() {
       className="border-t border-border"
     >
       <Container className="py-24">
-        <div className="mx-auto max-w-3xl text-center space-y-4">
+        <motion.div
+          className="mx-auto max-w-3xl text-center space-y-4"
+          initial={{ opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.7 }}
+          transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
+        >
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
             Simple by design
           </p>
@@ -51,15 +58,21 @@ export function HowItWorks() {
             Velora lets Nigerian freelancers and merchants accept USDC or SOL
             payments globally without custody, friction, or complex setup.
           </p>
-        </div>
+        </motion.div>
 
         <div className="mt-12 lg:mt-16">
           <div className="relative">
             <div className="hidden lg:block absolute inset-x-16 top-16 h-px bg-border/60" />
 
-            <div className="relative grid gap-6 sm:gap-8 lg:grid-cols-3">
+            <motion.div
+              className="relative grid gap-6 sm:gap-8 lg:grid-cols-3"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
+            >
               {STEPS.map(({ step, title, description, Icon }, index) => (
-                <div
+                <motion.div
                   key={step}
                   className={cn(
                     "rounded-2xl border border-border/80 bg-card p-6 sm:p-7",
@@ -69,6 +82,10 @@ export function HowItWorks() {
                     "flex flex-col gap-4",
                     index === 1 ? "lg:-translate-y-3" : "lg:translate-y-0",
                   )}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.4 }}
+                  transition={{ duration: 0.45, delay: 0.08 * index }}
                 >
                   <div className="flex items-center justify-between gap-4">
                     <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/5 px-3 py-1 text-xs font-medium text-emerald-300">
@@ -92,9 +109,9 @@ export function HowItWorks() {
                       {description}
                     </p>
                   </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         </div>
       </Container>
