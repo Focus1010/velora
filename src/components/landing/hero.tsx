@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 import { Container } from "@/components/Container";
 import { cn } from "@/lib/utils";
@@ -54,8 +55,8 @@ export function Hero() {
                 Built for Nigerian merchants.
               </h1>
               <p className="max-w-xl text-base sm:text-lg leading-relaxed text-muted-foreground">
-                Velora lets freelancers and businesses accept USDC or SOL
-                instantly using secure, non-custodial Solana Pay infrastructure.
+                Velora lets freelancers and businesses accept USDC or SOL using
+                simple, non-custodial payment links.
               </p>
             </motion.div>
 
@@ -67,21 +68,24 @@ export function Hero() {
               viewport={{ once: true, amount: 0.6 }}
               transition={{ duration: 0.6, delay: 0.18 }}
             >
-              <motion.button
-                type="button"
-                className={cn(
-                  "inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold",
-                  "bg-accent text-accent-foreground shadow-[0_18px_45px_rgba(0,0,0,0.55)]",
-                  "transition-transform transition-shadow duration-200",
-                  "hover:-translate-y-0.5 hover:shadow-[0_22px_60px_rgba(0,0,0,0.65)]",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background",
-                )}
+              <motion.div
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.15 }}
               >
-                Start accepting payments
-              </motion.button>
+                <Link
+                  href="/dashboard"
+                  className={cn(
+                    "inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold",
+                    "bg-accent text-accent-foreground shadow-[0_18px_45px_rgba(0,0,0,0.55)]",
+                    "transition-transform transition-shadow duration-200",
+                    "hover:-translate-y-0.5 hover:shadow-[0_22px_60px_rgba(0,0,0,0.65)]",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+                  )}
+                >
+                  Start accepting payments
+                </Link>
+              </motion.div>
               <motion.button
                 type="button"
                 className={cn(

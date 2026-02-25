@@ -12,7 +12,7 @@ const STEPS = [
   {
     step: "01",
     title: "Create a payment link",
-    description: "Generate a clean Solana Pay link or QR code for any amount.",
+    description: "Generate a clean USDC payment link for any amount.",
     Icon: LinkIcon,
   },
   {

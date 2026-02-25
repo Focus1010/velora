@@ -41,10 +41,10 @@ export function DashboardPreview() {
               <div className="mb-6 flex items-center justify-between gap-3">
                 <div>
                   <p className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                    Velora • Overview
+                    Merchant overview
                   </p>
                   <h3 className="mt-1 text-sm font-semibold text-foreground">
-                    Merchant dashboard
+                    Today&apos;s activity
                   </h3>
                 </div>
                 <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-1 text-[0.7rem] font-medium text-emerald-300">

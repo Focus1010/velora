@@ -7,7 +7,7 @@
 :root {
   --radius: 0.625rem;
   /* Velora core surface */
-  --background: hsl(217 4% 7%); /* #0E1116 */
+  --background: hsl(0 0% 0%); /* true black */
   --foreground: hsl(216 11% 91%); /* #E6E8EB */
 
   /* Surfaces */
@@ -99,7 +99,7 @@
 
 .dark {
   /* Slightly deeper dark mode surfaces and crisper borders */
-  --background: hsl(217 5% 5%);
+  --background: hsl(0 0% 0%);
   --card: hsl(215 25% 10%);
   --border: hsla(0 0% 100% / 0.08);
   --input: hsla(0 0% 100% / 0.1);
@@ -110,7 +110,9 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html,
   body {
-    @apply bg-background text-foreground antialiased;
+    background-color: #000000;
+    color: hsl(216 11% 91%);
   }
 }

@@ -63,7 +63,7 @@ export function Footer() {
                 Built for merchants in Nigeria.
               </p>
               <p>
-                Powered by Solana Pay.
+                Powered by non-custodial crypto rails.
               </p>
             </div>
           </div>
