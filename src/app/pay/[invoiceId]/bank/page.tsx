@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
+import { getInvoices, setInvoices } from "@/lib/storage";
 
 export default function BankPayPage() {
   const params = useParams();
@@ -42,10 +43,20 @@ export default function BankPayPage() {
     setState("verifying");
     setTimeout(() => {
       if (invoiceId) {
-        try {
-          window.localStorage.setItem(`invoice_${invoiceId}`, "paid");
-        } catch {
-          // ignore
+        if (typeof window !== "undefined") {
+          try {
+            window.localStorage.setItem(`invoice_${invoiceId}`, "paid");
+          } catch {
+            // ignore
+          }
+        }
+        const stored = getInvoices() as any[];
+        const updated = stored.map((invoice) =>
+          invoice.id === invoiceId ? { ...invoice, status: "paid" } : invoice,
+        );
+        setInvoices(updated);
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("velora_invoice_updated"));
         }
       }
       setState("success");

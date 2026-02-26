@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 
 import { Container } from "@/components/Container";
 import { cn } from "@/lib/utils";
+import { getInvoices, setInvoices } from "@/lib/storage";
 
 function truncateAddress(address: string, chars = 4) {
   if (address.length <= chars * 2) return address;
@@ -37,8 +38,18 @@ export default function PayPage() {
     setTimeout(() => {
       setIsPaying(false);
       setIsPaid(true);
-      if (typeof window !== "undefined" && invoiceId) {
-        window.localStorage.setItem(`invoice_${invoiceId}`, "paid");
+      if (invoiceId) {
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem(`invoice_${invoiceId}`, "paid");
+        }
+        const stored = getInvoices() as any[];
+        const updated = stored.map((invoice) =>
+          invoice.id === invoiceId ? { ...invoice, status: "paid" } : invoice,
+        );
+        setInvoices(updated);
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("velora_invoice_updated"));
+        }
       }
     }, 900);
   };

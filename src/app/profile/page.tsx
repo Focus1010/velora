@@ -5,11 +5,12 @@ import { motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 import { useAuthGuard } from "@/hooks/use-auth";
+import { getUser, setUser } from "@/lib/storage";
 
 interface UserProfile {
   name: string;
   email: string;
-  role: "Owner" | "Admin" | "Accountant";
+  role: "Owner" | "Admin" | "Accountant" | "Finance" | "Operations" | "Developer";
   wallet: string;
 }
 
@@ -21,24 +22,22 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!isReady) return;
-    try {
-      const raw = window.localStorage.getItem("velora_user");
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as Partial<UserProfile>;
-      setProfile({
-        name: parsed.name ?? "Demo Merchant",
-        email: parsed.email ?? "merchant@gmail.com",
-        role: (parsed.role as UserProfile["role"]) ?? "Owner",
-        wallet: parsed.wallet ?? "",
-      });
-    } catch {
+    const stored = getUser() as Partial<UserProfile> | null;
+    if (!stored) {
       setProfile({
         name: "Demo Merchant",
         email: "merchant@gmail.com",
         role: "Owner",
         wallet: "",
       });
+      return;
     }
+    setProfile({
+      name: stored.name ?? "Demo Merchant",
+      email: stored.email ?? "merchant@gmail.com",
+      role: (stored.role as UserProfile["role"]) ?? "Owner",
+      wallet: stored.wallet ?? "",
+    });
   }, [isReady]);
 
   const handleChange =
@@ -53,11 +52,7 @@ export default function ProfilePage() {
     setIsSaving(true);
     setSaved(false);
     setTimeout(() => {
-      try {
-        window.localStorage.setItem("velora_user", JSON.stringify(profile));
-      } catch {
-        // ignore
-      }
+      setUser(profile);
       setIsSaving(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 1200);
@@ -139,6 +134,9 @@ export default function ProfilePage() {
                     <option value="Owner">Owner</option>
                     <option value="Admin">Admin</option>
                     <option value="Accountant">Accountant</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Operations">Operations</option>
+                    <option value="Developer">Developer</option>
                   </select>
                 </div>
               </div>

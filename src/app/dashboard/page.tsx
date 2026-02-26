@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
+import { User } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
@@ -8,6 +10,7 @@ import PaymentGenerator, {
   type Invoice,
 } from "@/components/dashboard/payment-generator";
 import { useAuthGuard } from "@/hooks/use-auth";
+import { getInvoices, setInvoices } from "@/lib/storage";
 
 const fadeInUp = {
   initial: { opacity: 0, y: 24 },
@@ -16,34 +19,94 @@ const fadeInUp = {
 
 export default function Dashboard() {
   const { isReady } = useAuthGuard();
-  const [invoices, setInvoices] = React.useState<Invoice[]>([]);
+  const [invoices, setInvoicesState] = React.useState<Invoice[]>([]);
+  const [metrics, setMetrics] = React.useState({
+    revenue: 0,
+    invoiceCount: 0,
+    conversion: 0,
+  });
+  const [chartPoints, setChartPoints] = React.useState<
+    { id: string; x: number; y: number; amount: number }
+  >([]);
+  const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
 
   React.useEffect(() => {
-    setInvoices((prev) =>
-      prev.map((invoice) => {
-        if (typeof window === "undefined") return invoice;
-        const stored = window.localStorage.getItem(
-          `invoice_${invoice.id}`,
-        );
-        if (stored === "paid") {
+    const stored = getInvoices() as Invoice[];
+    const updated = stored.map((invoice) => {
+      if (typeof window === "undefined") return invoice;
+      const status = window.localStorage.getItem(`invoice_${invoice.id}`);
+      if (status === "paid") {
+        return { ...invoice, status: "paid" };
+      }
+      return invoice;
+    });
+    setInvoicesState(updated);
+  }, []);
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const refresh = () => {
+      const updated = (getInvoices() as Invoice[]).map((invoice) => {
+        const status = window.localStorage.getItem(`invoice_${invoice.id}`);
+        if (status === "paid") {
           return { ...invoice, status: "paid" };
         }
         return invoice;
-      }),
-    );
+      });
+      setInvoicesState(updated);
+    };
+
+    window.addEventListener("velora_invoice_updated", refresh);
+    return () => {
+      window.removeEventListener("velora_invoice_updated", refresh);
+    };
   }, []);
 
-  const totalVolume = invoices.reduce(
-    (sum, invoice) => sum + invoice.amount,
-    0,
-  );
-  const totalInvoices = invoices.length;
-  const paidInvoices = invoices.filter(
-    (invoice) => invoice.status === "paid",
-  ).length;
+  React.useEffect(() => {
+    if (!invoices.length) {
+      setMetrics({ revenue: 0, invoiceCount: 0, conversion: 0 });
+      setChartPoints([]);
+      setActiveIndex(null);
+      return;
+    }
+    const paid = invoices.filter((invoice) => invoice.status === "paid");
+    const revenue = paid.reduce((sum, invoice) => sum + invoice.amount, 0);
+    const invoiceCount = invoices.length;
+    const conversion =
+      invoiceCount === 0 ? 0 : (paid.length / invoiceCount) * 100;
+
+    setMetrics({
+      revenue,
+      invoiceCount,
+      conversion,
+    });
+
+    const recent = invoices.slice(-6);
+    const maxAmount =
+      recent.reduce((max, invoice) => Math.max(max, invoice.amount), 0) || 1;
+    const stepX = recent.length > 1 ? 100 / (recent.length - 1) : 0;
+
+    const points = recent.map((invoice, index) => ({
+      id: invoice.id,
+      amount: invoice.amount,
+      x: stepX * index,
+      y: 95 - (invoice.amount / maxAmount) * 70, // keep line in viewBox
+    }));
+
+    setChartPoints(points);
+    setActiveIndex(points.length ? points.length - 1 : null);
+  }, [invoices]);
 
   const handleCreateInvoice = (invoice: Invoice) => {
-    setInvoices((prev) => [invoice, ...prev]);
+    setInvoicesState((prev) => {
+      const next = [invoice, ...prev];
+      setInvoices(next);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("velora_invoice_updated"));
+      }
+      return next;
+    });
   };
 
   if (!isReady) return null;
@@ -67,20 +130,21 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <button
-            type="button"
+          <Link
+            href="/profile"
             className={cn(
-              "inline-flex items-center justify-center rounded-xl px-6 py-3",
-              "bg-[#1F8A70] text-white font-medium text-sm",
+              "inline-flex items-center justify-center rounded-full p-2.5",
+              "border border-white/10 bg-zinc-900/80 text-zinc-200",
               "shadow-md hover:shadow-lg",
-              "transition-all duration-300 ease-out",
-              "hover:-translate-y-0.5 hover:bg-[#1a735c]",
-              "focus:outline-none focus:ring-2 focus:ring-[#1F8A70]/50 focus:ring-offset-2 focus:ring-offset-[#0E1116]",
+              "transition-all duration-200 ease-out",
+              "hover:-translate-y-0.5 hover:bg-zinc-800",
+              "focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:ring-offset-2 focus:ring-offset-black",
               "active:scale-95",
             )}
+            aria-label="Open profile"
           >
-            New Invoice
-          </button>
+            <User className="h-4 w-4" />
+          </Link>
         </motion.div>
 
         <motion.div
@@ -90,40 +154,92 @@ export default function Dashboard() {
           transition={{ duration: 0.6, delay: 0.05, ease: [0.21, 0.47, 0.32, 0.98] }}
         >
           <motion.div
-            className="rounded-2xl border border-white/5 bg-gradient-to-br from-white/10 to-white/[0.02] px-4 py-5 sm:px-5 sm:py-6 shadow-xl shadow-black/40 rounded-2xl"
+            className="rounded-3xl border border-white/5 bg-zinc-900/80 px-4 py-5 sm:px-5 sm:py-6 shadow-2xl shadow-black/50"
             variants={fadeInUp}
           >
             <p className="text-xs font-medium tracking-[0.18em] text-gray-400 uppercase">
-              Total Volume
+              💰 Total Revenue
             </p>
             <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
-              ${totalVolume.toFixed(2)}
+              ₦{metrics.revenue.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </motion.div>
 
           <motion.div
-            className="rounded-2xl border border-white/5 bg-zinc-900/70 backdrop-blur px-4 py-5 sm:px-5 sm:py-6 shadow-xl shadow-black/40"
+            className="rounded-3xl border border-white/5 bg-zinc-900/80 px-4 py-5 sm:px-5 sm:py-6 shadow-2xl shadow-black/50"
             variants={fadeInUp}
           >
             <p className="text-xs font-medium tracking-[0.18em] text-gray-400 uppercase">
-              Total Invoices
+              📄 Total Invoices
             </p>
             <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
-              {totalInvoices}
+              {metrics.invoiceCount}
             </p>
           </motion.div>
 
           <motion.div
-            className="rounded-2xl border border-emerald-500/25 bg-gradient-to-br from-emerald-500/20 to-emerald-500/10 px-4 py-5 sm:px-5 sm:py-6 shadow-xl shadow-black/40"
+            className="rounded-3xl border border-white/5 bg-zinc-900/80 px-4 py-5 sm:px-5 sm:py-6 shadow-2xl shadow-black/50"
             variants={fadeInUp}
           >
-            <p className="text-xs font-medium tracking-[0.18em] text-emerald-200 uppercase">
-              Paid Invoices
+            <p className="text-xs font-medium tracking-[0.18em] text-gray-400 uppercase">
+              📊 Conversion Rate
             </p>
             <p className="mt-3 text-3xl font-semibold tracking-tight text-emerald-100">
-              {paidInvoices}
+              {metrics.conversion.toFixed(0)}%
             </p>
           </motion.div>
+        </motion.div>
+
+        <motion.div
+          className="mb-10 mt-2 rounded-3xl border border-white/5 bg-zinc-900/80 px-4 py-4 shadow-2xl shadow-black/50"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+        >
+          <p className="mb-2 text-xs font-medium text-gray-400 uppercase tracking-[0.18em]">
+            Revenue (last 6 invoices)
+          </p>
+          <div className="h-24">
+            <svg viewBox="0 0 100 100" className="h-full w-full">
+              {chartPoints.length > 1 && (
+                <motion.polyline
+                  fill="none"
+                  stroke="rgba(16,185,129,0.8)"
+                  strokeWidth="1.5"
+                  points={chartPoints.map((p) => `${p.x},${p.y}`).join(" ")}
+                  initial={{ pathLength: 0 }}
+                  animate={{ pathLength: 1 }}
+                  transition={{ duration: 0.4 }}
+                />
+              )}
+              {chartPoints.map((point, index) => (
+                <g key={`point-${point.id}-${index}`}>
+                  <motion.circle
+                    cx={point.x}
+                    cy={point.y}
+                    r={activeIndex === index ? 1.8 : 1.2}
+                    fill={
+                      activeIndex === index
+                        ? "rgba(16,185,129,1)"
+                        : "rgba(16,185,129,0.7)"
+                    }
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.2, delay: 0.05 * index }}
+                    onMouseEnter={() => setActiveIndex(index)}
+                  />
+                </g>
+              ))}
+            </svg>
+          </div>
+          {activeIndex !== null && chartPoints[activeIndex] && (
+            <p className="mt-2 text-xs text-gray-400">
+              Invoice {chartPoints.length - activeIndex} ·{" "}
+              <span className="text-emerald-300">
+                ${chartPoints[activeIndex].amount.toFixed(2)} USDC
+              </span>
+            </p>
+          )}
         </motion.div>
 
         <motion.div
@@ -166,9 +282,9 @@ export default function Dashboard() {
                     No invoices yet. Create your first invoice to see it here.
                   </p>
                 ) : (
-                  invoices.slice(0, 5).map((invoice) => (
+                  invoices.slice(0, 5).map((invoice, index) => (
                     <div
-                      key={invoice.id}
+                      key={`invoice-${invoice.id}-${index}`}
                       className="flex items-center justify-between rounded-lg border border-white/8 bg-white/[0.02] px-3 py-2.5 text-sm"
                     >
                       <div>
