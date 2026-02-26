@@ -20,13 +20,15 @@ const fadeInUp = {
 export default function Dashboard() {
   const { isReady } = useAuthGuard();
   const [invoices, setInvoicesState] = React.useState<Invoice[]>([]);
+  const [timePeriod, setTimePeriod] = React.useState<7 | 14 | 30>(7);
   const [metrics, setMetrics] = React.useState({
     revenue: 0,
     invoiceCount: 0,
     conversion: 0,
+    trend: 0,
   });
   const [chartPoints, setChartPoints] = React.useState<
-    { id: string; x: number; y: number; amount: number }[]
+    { id: string; x: number; y: number; amount: number; date: Date }[]
   >([]);
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
 
@@ -65,38 +67,84 @@ export default function Dashboard() {
 
   React.useEffect(() => {
     if (!invoices.length) {
-      setMetrics({ revenue: 0, invoiceCount: 0, conversion: 0 });
+      setMetrics({ revenue: 0, invoiceCount: 0, conversion: 0, trend: 0 });
       setChartPoints([]);
       setActiveIndex(null);
       return;
     }
-    const paid = invoices.filter((invoice) => invoice.status === "paid");
+
+    // Filter invoices by time period
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - timePeriod);
+    const periodInvoices = invoices.filter(invoice => 
+      new Date(invoice.createdAt) >= cutoffDate
+    );
+
+    const paid = periodInvoices.filter((invoice) => invoice.status === "paid");
     const revenue = paid.reduce((sum, invoice) => sum + invoice.amount, 0);
-    const invoiceCount = invoices.length;
+    const invoiceCount = periodInvoices.length;
     const conversion =
       invoiceCount === 0 ? 0 : (paid.length / invoiceCount) * 100;
+
+    // Calculate trend (compare with previous period)
+    const previousCutoffDate = new Date(cutoffDate);
+    previousCutoffDate.setDate(previousCutoffDate.getDate() - timePeriod);
+    const previousPeriodInvoices = invoices.filter(invoice => 
+      new Date(invoice.createdAt) >= previousCutoffDate && 
+      new Date(invoice.createdAt) < cutoffDate
+    );
+    const previousRevenue = previousPeriodInvoices
+      .filter(invoice => invoice.status === "paid")
+      .reduce((sum, invoice) => sum + invoice.amount, 0);
+    
+    const trend = previousRevenue === 0 ? 0 : ((revenue - previousRevenue) / previousRevenue) * 100;
 
     setMetrics({
       revenue,
       invoiceCount,
       conversion,
+      trend,
     });
 
-    const recent = invoices.slice(-6);
-    const maxAmount =
-      recent.reduce((max, invoice) => Math.max(max, invoice.amount), 0) || 1;
-    const stepX = recent.length > 1 ? 100 / (recent.length - 1) : 0;
+    // Create chart points with daily aggregation
+    const dailyData: { [key: string]: { amount: number; date: Date; invoices: Invoice[] } } = {};
+    
+    // Initialize all days in the period
+    for (let i = timePeriod - 1; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateKey = date.toISOString().split('T')[0];
+      dailyData[dateKey] = { amount: 0, date, invoices: [] };
+    }
 
-    const points = recent.map((invoice, index) => ({
-      id: invoice.id,
-      amount: invoice.amount,
-      x: stepX * index,
-      y: 95 - (invoice.amount / maxAmount) * 70, // keep line in viewBox
+    // Aggregate invoices by day
+    periodInvoices.forEach(invoice => {
+      if (invoice.status === "paid") {
+        const dateKey = new Date(invoice.createdAt).toISOString().split('T')[0];
+        if (dailyData[dateKey]) {
+          dailyData[dateKey].amount += invoice.amount;
+          dailyData[dateKey].invoices.push(invoice);
+        }
+      }
+    });
+
+    const points = Object.values(dailyData).map((day, index) => ({
+      id: day.date.toISOString(),
+      amount: day.amount,
+      date: day.date,
+      x: (index / (timePeriod - 1)) * 100,
+      y: 0, // Will be calculated below
     }));
+
+    // Calculate Y positions
+    const maxAmount = Math.max(...points.map(p => p.amount), 1);
+    points.forEach(point => {
+      point.y = 95 - (point.amount / maxAmount) * 70;
+    });
 
     setChartPoints(points);
     setActiveIndex(points.length ? points.length - 1 : null);
-  }, [invoices]);
+  }, [invoices, timePeriod]);
 
   const handleCreateInvoice = (invoice: Invoice) => {
     const updatedInvoices = [invoice, ...getInvoices()];
@@ -158,9 +206,21 @@ export default function Dashboard() {
             <p className="text-xs font-medium tracking-[0.18em] text-gray-400 uppercase">
               💰 Total Revenue
             </p>
-            <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
-              ₦{metrics.revenue.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            </p>
+            <div className="mt-3 flex items-end justify-between">
+              <p className="text-3xl font-semibold tracking-tight text-white">
+                ${metrics.revenue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              {metrics.trend !== 0 && (
+                <div className={cn(
+                  "flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium",
+                  metrics.trend > 0 
+                    ? "bg-emerald-500/15 text-emerald-400" 
+                    : "bg-red-500/15 text-red-400"
+                )}>
+                  {metrics.trend > 0 ? "↑" : "↓"} {Math.abs(metrics.trend).toFixed(1)}%
+                </div>
+              )}
+            </div>
           </motion.div>
 
           <motion.div
@@ -194,10 +254,28 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <p className="mb-2 text-xs font-medium text-gray-400 uppercase tracking-[0.18em]">
-            Revenue (last 6 invoices)
-          </p>
-          <div className="h-24">
+          <div className="mb-4 flex items-center justify-between">
+            <p className="text-xs font-medium text-gray-400 uppercase tracking-[0.18em]">
+              Revenue Trend
+            </p>
+            <div className="flex gap-1 rounded-lg border border-white/10 bg-black/40 p-1">
+              {[7, 14, 30].map((period) => (
+                <button
+                  key={period}
+                  onClick={() => setTimePeriod(period as 7 | 14 | 30)}
+                  className={cn(
+                    "rounded-md px-3 py-1 text-xs font-medium transition-all duration-200",
+                    timePeriod === period
+                      ? "bg-emerald-500 text-white"
+                      : "text-gray-400 hover:text-white hover:bg-white/10"
+                  )}
+                >
+                  {period}d
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="h-32">
             <svg viewBox="0 0 100 100" className="h-full w-full">
               {chartPoints.length > 1 && (
                 <motion.polyline
@@ -215,7 +293,7 @@ export default function Dashboard() {
                   <motion.circle
                     cx={point.x}
                     cy={point.y}
-                    r={activeIndex === index ? 1.8 : 1.2}
+                    r={activeIndex === index ? 2 : 1.5}
                     fill={
                       activeIndex === index
                         ? "rgba(16,185,129,1)"
@@ -232,7 +310,7 @@ export default function Dashboard() {
           </div>
           {activeIndex !== null && chartPoints[activeIndex] && (
             <p className="mt-2 text-xs text-gray-400">
-              Invoice {chartPoints.length - activeIndex} ·{" "}
+              {chartPoints[activeIndex].date.toLocaleDateString()} ·{" "}
               <span className="text-emerald-300">
                 ${chartPoints[activeIndex].amount.toFixed(2)} USDC
               </span>
