@@ -99,14 +99,12 @@ export default function Dashboard() {
   }, [invoices]);
 
   const handleCreateInvoice = (invoice: Invoice) => {
-    setInvoicesState((prev) => {
-      const next = [invoice, ...prev];
-      setInvoices(next);
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(new Event("velora_invoice_updated"));
-      }
-      return next;
-    });
+    const updatedInvoices = [invoice, ...getInvoices()];
+    setInvoices(updatedInvoices);
+    setInvoicesState(updatedInvoices);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("velora_invoice_updated"));
+    }
   };
 
   if (!isReady) return null;

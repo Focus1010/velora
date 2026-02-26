@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import { useAuthGuard } from "@/hooks/use-auth";
 import { getUser, setUser, logout } from "@/lib/storage";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 interface UserProfile {
   name: string;
@@ -72,13 +74,35 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-black">
       <div className="mx-auto max-w-6xl px-6 py-12">
         <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mb-6"
+        >
+          <Link
+            href="/dashboard"
+            className={cn(
+              "inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium",
+              "border border-white/10 bg-zinc-900/80 text-zinc-300",
+              "transition-all duration-200 ease-out",
+              "hover:bg-zinc-800 hover:text-white hover:border-white/20",
+              "focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-black",
+              "active:scale-95",
+            )}
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Dashboard
+          </Link>
+        </motion.div>
+
+        <motion.div
           className={cn(
             "w-full max-w-2xl rounded-3xl border border-white/5 bg-zinc-900/80",
             "shadow-2xl shadow-black/50 px-6 py-8 sm:px-8 sm:py-10",
           )}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
         >
           <div className="mb-6 space-y-1">
             <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
