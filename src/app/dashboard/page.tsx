@@ -36,9 +36,9 @@ export default function Dashboard() {
       if (typeof window === "undefined") return invoice;
       const status = window.localStorage.getItem(`invoice_${invoice.id}`);
       if (status === "paid") {
-        return { ...invoice, status: "paid" };
+        return { ...invoice, status: "paid" as const };
       }
-      return invoice;
+      return { ...invoice, status: "pending" as const };
     });
     setInvoicesState(updated);
   }, []);
@@ -50,9 +50,9 @@ export default function Dashboard() {
       const updated = (getInvoices() as Invoice[]).map((invoice) => {
         const status = window.localStorage.getItem(`invoice_${invoice.id}`);
         if (status === "paid") {
-          return { ...invoice, status: "paid" };
+          return { ...invoice, status: "paid" as const };
         }
-        return invoice;
+        return { ...invoice, status: "pending" as const };
       });
       setInvoicesState(updated);
     };
