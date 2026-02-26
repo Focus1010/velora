@@ -141,7 +141,7 @@ export default function PayPage() {
                   "disabled:opacity-50 disabled:cursor-not-allowed",
                 )}
               >
-                {linkCopied ? "Link copied" : "🔗 Copy Invoice Link"}
+                {linkCopied ? "Link copied" : "Copy Invoice Link"}
               </button>
 
               <p className="text-[0.7rem] text-center text-muted-foreground">

@@ -32,7 +32,7 @@ export default function PaySuccessPage() {
         >
           <div className="space-y-4 text-center">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
-              ✓
+              Success
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">

@@ -204,12 +204,17 @@ export default function Dashboard() {
             variants={fadeInUp}
           >
             <p className="text-xs font-medium tracking-[0.18em] text-gray-400 uppercase">
-              💰 Total Revenue
+              Total Revenue
             </p>
             <div className="mt-3 flex items-end justify-between">
-              <p className="text-3xl font-semibold tracking-tight text-white">
-                ${metrics.revenue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </p>
+              <div>
+                <p className="text-3xl font-semibold tracking-tight text-white">
+                  ${metrics.revenue.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </p>
+                <p className="text-sm text-gray-500 opacity-60">
+                  (₦{(metrics.revenue * 1400).toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })})
+                </p>
+              </div>
               {metrics.trend !== 0 && (
                 <div className={cn(
                   "flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium",
@@ -228,7 +233,7 @@ export default function Dashboard() {
             variants={fadeInUp}
           >
             <p className="text-xs font-medium tracking-[0.18em] text-gray-400 uppercase">
-              📄 Total Invoices
+              Total Invoices
             </p>
             <p className="mt-3 text-3xl font-semibold tracking-tight text-white">
               {metrics.invoiceCount}
@@ -240,7 +245,7 @@ export default function Dashboard() {
             variants={fadeInUp}
           >
             <p className="text-xs font-medium tracking-[0.18em] text-gray-400 uppercase">
-              📊 Conversion Rate
+              Conversion Rate
             </p>
             <p className="mt-3 text-3xl font-semibold tracking-tight text-emerald-100">
               {metrics.conversion.toFixed(0)}%

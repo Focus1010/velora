@@ -175,7 +175,7 @@ export default function BankPayPage() {
           {state === "success" && (
             <div className="mt-4 space-y-3 text-center">
               <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
-                ✓
+                Success
               </div>
               <p className="text-sm font-medium text-white">
                 Transfer confirmed

@@ -151,7 +151,7 @@ export default function CardPayPage() {
 
                 <p className="text-[0.7rem] text-zinc-500 text-center">
                   <span className="mr-1.5 inline-flex h-4 w-4 items-center justify-center rounded-full border border-zinc-600 text-[0.6rem]">
-                    🔒
+                    Locked
                   </span>
                   256-bit encrypted. Card details are never stored.
                 </p>
@@ -174,7 +174,7 @@ export default function CardPayPage() {
           {state === "success" && (
             <div className="space-y-4 text-center">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-300">
-                ✓
+                Success
               </div>
               <h2 className="text-lg font-semibold text-white">
                 Payment Successful
