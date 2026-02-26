@@ -9,13 +9,20 @@ import { cn } from "@/lib/utils";
 export default function LoginPage() {
   const router = useRouter();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
 
   const handleGoogle = () => {
+    if (!email || !name) {
+      alert("Please enter your name and email");
+      return;
+    }
+
     setIsGoogleLoading(true);
     setTimeout(() => {
       const user = {
-        name: "Demo Merchant",
-        email: "merchant@gmail.com",
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
         role: "Owner",
         wallet: "",
       };
@@ -49,8 +56,43 @@ export default function LoginPage() {
               Welcome to Velora
             </h1>
             <p className="text-sm text-zinc-400">
-              Sign in to access your merchant dashboard.
+              Enter your details to access your merchant dashboard.
             </p>
+          </div>
+
+          <div className="space-y-4 mb-6">
+            <div>
+              <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                Name
+              </label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name"
+                className={cn(
+                  "w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5",
+                  "text-sm text-white placeholder-zinc-500",
+                  "focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50",
+                )}
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className={cn(
+                  "w-full rounded-xl border border-white/10 bg-black/40 px-4 py-2.5",
+                  "text-sm text-white placeholder-zinc-500",
+                  "focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50",
+                )}
+              />
+            </div>
           </div>
 
           <div className="space-y-3">
@@ -68,7 +110,7 @@ export default function LoginPage() {
                 "disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0",
               )}
             >
-              {isGoogleLoading ? "Connecting to Google…" : "Continue with Google"}
+              {isGoogleLoading ? "Signing in…" : "Sign In"}
             </button>
 
             <button

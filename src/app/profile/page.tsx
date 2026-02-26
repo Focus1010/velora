@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 import { useAuthGuard } from "@/hooks/use-auth";
-import { getUser, setUser } from "@/lib/storage";
+import { getUser, setUser, logout } from "@/lib/storage";
+import { useRouter } from "next/navigation";
 
 interface UserProfile {
   name: string;
@@ -16,6 +17,7 @@ interface UserProfile {
 
 export default function ProfilePage() {
   const { isReady } = useAuthGuard();
+  const router = useRouter();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -57,6 +59,11 @@ export default function ProfilePage() {
       setSaved(true);
       setTimeout(() => setSaved(false), 1200);
     }, 600);
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push("/auth/login");
   };
 
   if (!isReady || !profile) return null;
@@ -184,11 +191,28 @@ export default function ProfilePage() {
                 {isSaving ? "Saving…" : "Save changes"}
               </button>
 
-              {saved && (
-                <span className="text-xs text-emerald-300">
-                  Profile updated
-                </span>
-              )}
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className={cn(
+                    "inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-medium",
+                    "border border-red-500/20 bg-red-500/10 text-red-400",
+                    "transition-all duration-200 ease-out",
+                    "hover:bg-red-500/20 hover:text-red-300 hover:border-red-500/30",
+                    "focus:outline-none focus:ring-2 focus:ring-red-500/40 focus:ring-offset-2 focus:ring-offset-black",
+                    "active:scale-95",
+                  )}
+                >
+                  Logout
+                </button>
+
+                {saved && (
+                  <span className="text-xs text-emerald-300">
+                    Profile updated
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </motion.div>
