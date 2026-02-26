@@ -26,7 +26,7 @@ export default function Dashboard() {
     conversion: 0,
   });
   const [chartPoints, setChartPoints] = React.useState<
-    { id: string; x: number; y: number; amount: number }
+    { id: string; x: number; y: number; amount: number }[]
   >([]);
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
 
